@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        description: Hashlink debugger version (tag)
+        default: 1.4.33
+        required: true
+jobs:
+  build:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v5
+        with:
+          repository: 'vshaxe/hashlink-debugger'
+          ref: ${{ github.event.inputs.version }}
+
+      - name: Install Haxe
+        uses: krdlab/setup-haxe@v1
+        with:
+          haxe-version: 4.3.6
+
+      - name: Install dependencies
+        run: |
+          haxelib git format https://github.com/HaxeFoundation/format.git
+          haxelib git hscript https://github.com/HaxeFoundation/hscript.git
+          haxelib install vshaxe
+          haxelib install vscode
+          haxelib install vscode-debugadapter
+
+      - name: Applying patch
+        run: |
+          curl -L https://github.com/SnakE-2024/hashlink-standalone-debugger/blob/main/hashlink-debugger-1433.patch | git apply
+
+      - name: Build standalone adapter.js
+        run: haxe build.hxml
+
+      - name: Build standalone adapter.js
+        run: tar -czvf hashlink-dap.tar.gz adapter.js
+
+      - name: Create Release & Upload
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          name: "Hashlink DAP ${{ github.event.inputs.version }}"
+          files: hashlink-dap.tar.gz
+          make_latest: true
