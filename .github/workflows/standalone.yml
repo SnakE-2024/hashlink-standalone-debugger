@@ -34,7 +34,7 @@ jobs:
 
       - name: Applying patch
         run: |
-          curl -L https://github.com/SnakE-2024/hashlink-standalone-debugger/blob/main/hashlink-debugger-1433.patch | git apply
+          curl -L https://raw.githubusercontent.com/SnakE-2024/hashlink-standalone-debugger/refs/heads/main/hashlink-debugger-1433.patch | git apply
 
       - name: Build standalone adapter.js
         run: haxe build.hxml
