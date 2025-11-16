@@ -22,3 +22,4 @@ index 491edd6..b32bf64 100644
  		response.body = {
  			stackFrames : [for( i in 0...count ) {
  				var f = bt[start + i];
+     
